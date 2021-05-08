@@ -1,1 +1,1 @@
-# geekbrains_db
+# GEEKBRAINS - Основы реляционных баз данных. MySQL
