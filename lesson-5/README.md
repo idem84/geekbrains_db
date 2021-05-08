@@ -32,3 +32,22 @@ SELECT * FROM storehouses_products order by if(`value` = 0,1,0), `value`;
 ```
 SELECT * FROM catalogs WHERE id IN (5, 1, 2) ORDER BY FIELD(id, 5, 1, 2); 
 ```
+
+## Практическое задание теме «Агрегация данных»
+
+1) Подсчитайте средний возраст пользователей в таблице users.
+```
+SELECT name, timestampdiff(YEAR, birthday_at, NOW()) as age FROM eshop.users;
+```
+2) Подсчитайте количество дней рождения, которые приходятся на каждый из дней недели. Следует учесть, что необходимы дни недели текущего года, а не года рождения.
+```
+SELECT
+ dayname(concat(YEAR(NOW()), '-', substring(birthday_at, 6, 10))) as days,
+ count(dayname(concat(YEAR(NOW()), '-', substring(birthday_at, 6, 10)))) as amount
+ FROM users
+ group by days;
+ ```
+ 3) (по желанию) Подсчитайте произведение чисел в столбце таблицы.
+```
+select round(exp(sum(log(value)))) as factorial FROM numbers;
+```
