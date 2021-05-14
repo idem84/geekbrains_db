@@ -60,3 +60,47 @@ WHERE
 AND
 	m.to_user_id = 10;
 ```
+
+3) Подсчитать общее количество лайков, которые получили 10 самых молодых пользователей.
+
+Тут тоже можно по разному трактовать задачу, общие количество лайков для каждого из них или в сумме?
+
+Если для каждого то:
+
+```
+SELECT
+	u.id,
+	p.birthday,
+	(SELECT count(*) from likes l where l.user_id = u.id) as total_likes
+FROM 
+	users u
+INNER JOIN 
+	`profiles` p on (p.user_id = u.id)
+ORDER BY 
+	p.birthday desc
+LIMIT 10;
+```
+
+Если в сумме то:
+
+```
+SELECT
+	count(*) as total_likes
+FROM
+	likes l
+INNER JOIN (
+	SELECT
+		u.id
+	FROM 
+		users u
+	INNER JOIN 
+		`profiles` p on (p.user_id = u.id)
+	ORDER BY 
+		p.birthday desc
+	LIMIT 10
+	) as ij ON (ij.id = l.user_id)
+LIMIT 1;
+```
+
+4) Определить кто больше поставил лайков (всего) - мужчины или женщины?
+
