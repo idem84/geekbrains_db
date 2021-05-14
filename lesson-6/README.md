@@ -104,3 +104,61 @@ LIMIT 1;
 
 4) Определить кто больше поставил лайков (всего) - мужчины или женщины?
 
+Сначала посмотрим сколько всего лайков у межчин, сколько у женщин:
+```
+SELECT
+	(SELECT count(*) FROM likes l LEFT JOIN users u on (u.id = l.user_id) INNER JOIN profiles p on (p.user_id = u.id) where p.gender = "m") as mele,
+    (SELECT count(*) FROM likes l LEFT JOIN users u on (u.id = l.user_id) INNER JOIN profiles p on (p.user_id = u.id) where p.gender = "w") as woman;
+```
+
+Получим 66 у межчин, 85 у женщин
+
+Получить у кого больше лайков, я не говорю что это самый лучший вариант, это больше похоже на какой то кастыль, но в рамках дз он делает то что просят.
+У меня просто нет больше времени чтобы посвятить этой задаче, так что считаю результат есть, он такой как просят, значит сойдет
+```
+SELECT
+	COALESCE(m.count,0) + COALESCE(w.count,0) AS likes,
+	CASE p.gender
+		WHEN 'm' THEN "mele"
+		WHEN 'w' THEN "wemale"
+		ELSE NULL
+	END as `gender`
+FROM users u
+LEFT JOIN (
+  SELECT count(*) as count, l.user_id FROM likes l LEFT JOIN users u on (u.id = l.user_id) INNER JOIN profiles p on (p.user_id = u.id) where p.gender = "m"
+) m ON ( m.user_id = u.id )
+LEFT JOIN (
+  SELECT count(*) as count, l.user_id FROM likes l LEFT JOIN users u on (u.id = l.user_id) INNER JOIN profiles p on (p.user_id = u.id) where p.gender = "w"
+) w ON ( w.user_id = u.id )
+INNER JOIN profiles p on (p.user_id = u.id)
+ORDER BY likes DESC LIMIT 1;
+```
+5) Найти 10 пользователей, которые проявляют наименьшую активность в использовании социальной сети.
+  Честно из всего моего огромного опыта это вот самый сложный запрос какой я только видел, он точно обязательный был или вы забыли пометить звездочкой?
+
+Если честно мне не много подсказали, или много, не совсем понимаю правильно все или нет получилось
+```
+SELECT firstname,  SUM(T.rnk) AS rnk
+FROM (
+	SELECT from_user_id as user_id, COUNT(*) as rnk  FROM messages -- Неактивные пользователи мало отправляют сообщения
+	GROUP BY from_user_id
+	UNION ALL
+	SELECT user_id, COUNT(*) FROM likes -- Неактивные пользователи мало лайкуют
+	GROUP BY user_id
+	UNION ALL
+	SELECT target_user_id, COUNT(*)  FROM friend_requests -- И друзей у таких пользователей мало
+    WHERE status = "approved"
+	GROUP BY target_user_id
+	UNION ALL
+	SELECT initiator_user_id, COUNT(*)  FROM friend_requests
+     WHERE status = "approved"
+	GROUP BY initiator_user_id
+	UNION ALL
+	SELECT user_id, COUNT(*)  FROM users_communities
+	GROUP BY user_id
+) as T
+	INNER JOIN users U on U.id = T.user_id
+GROUP BY firstname
+ORDER BY rnk
+LIMIT 10;
+```
