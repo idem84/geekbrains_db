@@ -11,7 +11,9 @@ CREATE TABLE logs (
 	str_id BIGINT(20) NOT NULL,
 	name_value VARCHAR(45) NOT NULL
 ) ENGINE = ARCHIVE;
+````
 
+````
 DROP TRIGGER IF EXISTS log_users;
 delimiter //
 CREATE TRIGGER log_users AFTER INSERT ON users
@@ -21,7 +23,9 @@ BEGIN
 	VALUES (NOW(), 'users', NEW.id, NEW.name);
 END //
 delimiter ;
+````
 
+````
 DROP TRIGGER IF EXISTS log_catalogs;
 delimiter //
 CREATE TRIGGER log_catalogs AFTER INSERT ON catalogs
@@ -31,7 +35,9 @@ BEGIN
 	VALUES (NOW(), 'catalogs', NEW.id, NEW.name);
 END //
 delimiter ;
+````
 
+````
 delimiter //
 CREATE TRIGGER log_products AFTER INSERT ON products
 FOR EACH ROW
