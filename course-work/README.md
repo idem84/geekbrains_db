@@ -22,8 +22,21 @@
     Диаграмма находится в файле ERDiagram.mwb и ее скриншоте ERDiagram.JPG
 
 6) скрипты характерных выборок (включающие группировки, JOIN'ы, вложенные таблицы);
-
-    Запросы находятся в файле selects.sql
+````
+select reg.name, sum(price) as 'сумма недвижимости по району'
+from realty r
+         inner join category c on r.category_id = c.category_id
+         inner join region reg on r.code = reg.code
+group by reg.name;
+````
+````
+select (select name from seller where realty.seller_id = seller.seller_id) as 'продавец',
+       longitude,
+       latitude,
+       address,
+       price
+from realty;
+````
 
 7) представления (минимум 2);
 
@@ -39,7 +52,8 @@ from realty r
 where reg.code = 3
   and c.category_id = 1;
 ;
-
+````
+````
 CREATE OR REPLACE VIEW
     all_realty_view
 as
